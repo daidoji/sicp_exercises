@@ -38,14 +38,8 @@
 (define (fast-mult a b) 
   (cond ((= a 0) 0)
         ((= a 1) b)
-        ((even? a) (fast-mult-iter a b b))
-        (else (fast-mult-iter a b 0))))
-
-(define (fast-mult-iter a b tot)
-  (cond ((= a 1) (+ tot b))
-        ((even? a) (fast-mult-iter (halve a) b (double tot)))
-        (else (fast-mult-iter (+ a -1) b (+ tot b)))))
-
+        ((even? a) (fast-mult (halve a) (double b)))
+        (else (+ b (fast-mult (- a 1) b)))))
 
 (mult 2 3)
 (* 2 3)
