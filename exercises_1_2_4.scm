@@ -53,3 +53,51 @@
 (* 9 10)
 (mult 12 11)
 (* 12 11)
+
+
+;;; Exercise 1.19.  Define an iterative procedure running in O(ln N) for the
+;;; fib sequence
+;;; T_pq(n) -> 
+    ;;; a <- bq + aq + ap and 
+    ;;; b <- bp + aq
+;;;
+;;; T_01(n) ->
+;;;     a <- b + a   ;;; n
+;;;     b <- a       ;;; n - 1
+;;;
+;;; T_pq(n)^2 -> T_pq(T_pq(a,b)) ->
+;;;     a' <- (bp + aq)q + (bq + aq + ap)q + (bq + aq + ap)p
+;;;     b' <- (bp + aq)p + (bq + aq + ap)q
+;;;
+;;; T_pq(n)^2 -> T_pq(T_pq(1,0)) -> (2,1)
+;;;     a' <- (0p + 1q)q + (0q + 1q + 1p)q + (0q + 1q + 1p)p -> 2q^2 + 2pq + p^2
+;;;     b' <- (0p + 1q)p + (0q + 1q + 1p)q -> 2pq + q^2
+;;;
+;;;     2 = 2q^2 + 2pq + p^2
+;;;     1 = q^2 + 2pq
+;;;
+;;;     1 = q^2 + p^2 => sqrt(1 - q^2) = +p
+
+(define (fib n)
+  (fib-iter 1 0 0 1 n))
+(define (fib-iter a b p q count)
+  (cond ((= count 0) b)
+        ((even? count)
+         (fib-iter a
+                   b
+                   (+ (* p p) (* q q))      ; compute p'
+                   (+ (* 2 p q) (* q q))    ; compute q'
+                   (/ count 2)))
+        (else (fib-iter (+ (* b q) (* a q) (* a p))
+                        (+ (* b p) (* a q))
+                        p
+                        q
+                        (- count 1)))))
+
+(fib 1) ;;; 1
+(fib 2) ;;; 1
+(fib 3) ;;; 2
+(fib 4) ;;; 3
+(fib 5) ;;; 5
+(fib 6) ;;; 5
+(fib 1000)
