@@ -106,10 +106,61 @@
 ;;; tests whether a^n is congruent to a mod n for all a < n and try that
 ;;; function on the Carmicheal numbers
 
-(fermat-test 4)
-(fermat-test 561)
-(fermat-test 1105)
-(fermat-test 1729)
-(fermat-test 2465)
-(fermat-test 2821)
-(fermat-test 6601)
+(define (fermat-test n a)
+     (= (expmod a n n) a))
+
+(define (fermat-full n)
+     (define (iter a)
+            (cond ((= a 1) #t)
+                             ((not (fermat-test n a)) #f)
+                                        (else (iter (- a 1)))))
+        (iter (- n 1)))
+
+(fermat-full 4)
+(fermat-full 561)
+(fermat-full 1105)
+(fermat-full 1729)
+(fermat-full 2465)
+(fermat-full 2821)
+(fermat-full 6601)
+
+;;; Exercise 1.28
+;;;
+;;; Miller-Rabin test
+;;; 
+;;; a^(n-1) == 1 mod n if a is prime
+;;; pick random a<n
+;;; a^(n-1) 
+
+;;; modify expmod 1. number != 1 or n-1
+;;;               2. square == 1 mod n
+
+(define (expmod base exp m)
+  (cond
+    ((= exp 0) 1)
+    ((even? exp) 
+      (if (and 
+            (not (= (square (expmod base (/ exp 2) m)) (- m 1)))
+            (not (= (square (expmod base (/ exp 2) m)) 1))
+            (= (remainder (square (expmod base (/ exp 2) m)) m) 1)
+          ) 0 
+          (remainder (square (expmod base (/ exp 2) m)) m)))
+    (else 
+      (remainder (* base (expmod base (- exp 1) m)) m))))
+
+(define (miller-rabin n a)
+  (if (= (expmod a n n) 0) #t (= (expmod a n n) a)))
+
+(define (miller-rabin-full n)
+  (define (iter a) 
+    (cond ((= a 1) #t)
+          ((not (miller-rabin n a)) #f)
+          (else (iter (- a 1)))))
+  (iter (- n 1)))
+
+(miller-rabin-full 2)
+(miller-rabin-full 3)
+(miller-rabin-full 23)
+(miller-rabin-full 25)
+(miller-rabin-full 100)
+(miller-rabin-full 6601)
