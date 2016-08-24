@@ -37,3 +37,15 @@
 
 (simpsons-integral cube 0.0 1 100)
 (simpsons-integral cube 0.0 1 1000)
+
+; Exercise 1.30
+; Create an iterative sum procedure below
+
+(define (iter-sum term a next b)
+  (define (iter a result)
+    (if (> a b) result 
+      (iter (next a) (+ (term a) result))))
+  (iter 1 0))
+
+(sum cube 1 inc 10)
+(iter-sum cube 1 inc 3)
