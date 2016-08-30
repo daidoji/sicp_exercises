@@ -45,7 +45,42 @@
   (define (iter a result)
     (if (> a b) result 
       (iter (next a) (+ (term a) result))))
-  (iter 1 0))
+  (iter a 0))
 
 (sum cube 1 inc 10)
 (iter-sum cube 1 inc 3)
+
+; Exericse 1.31
+; Create a procedure similar to sum above but for product
+
+(define (product term a next b)
+  (if (> a b) 1
+    (* (term a) (product term (next a) next b))
+  )
+)
+
+(define (top-next i) (+ i (+ 2.0 (modulo i 2))))
+(define (bottom-next i) (+ i (+ 2.0 (modulo (+ i 1) 2))))
+
+(define (identity x) x)
+
+(define (est-pi i)
+    (* 4 (/ (product top-next 0 inc i) 
+            (product bottom-next 0 inc i))))
+(est-pi 150)
+
+(define (factorial n)
+  (if (= n 0) 0
+    (product identity 1 inc n)))
+(factorial 5)
+
+(define (iter-product term a next b)
+  (define (iter a result)
+    (if (> a b) result
+      (iter (next a (* (term a) result))))
+    (iter a 1)))
+
+(define (iter-est-pi i)
+    (* 4 (/ (iter-product top-next 0 inc i) 
+            (iter-product bottom-next 0 inc i))))
+(est-pi 150)
