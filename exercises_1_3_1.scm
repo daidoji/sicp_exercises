@@ -50,7 +50,7 @@
 (sum cube 1 inc 10)
 (iter-sum cube 1 inc 3)
 
-; Exericse 1.31
+; Exercise 1.31
 ; Create a procedure similar to sum above but for product
 
 (define (product term a next b)
@@ -84,3 +84,24 @@
     (* 4 (/ (iter-product top-next 0 inc i) 
             (iter-product bottom-next 0 inc i))))
 (est-pi 150)
+
+; Exercise 1.32
+; Show that sum and product are special cases of a generic function 'accumulate'
+; defined so (accumulate combiner null-value term a next b)
+; Implement accumulate iteratively and recursively
+
+(define (accumulate combiner null-value term a next b)
+  (if (> a b) null-value
+    (combiner (term a) (accumulate combiner 1 term (next a) next b)))
+)
+
+(accumulate * 1 identity 1 inc 10)
+
+(define (iter-accumulate combiner null-value term a next b)
+  (define (iter a result)
+    (if (> a b) result
+      (iter (next a (combiner (term a) result))))
+    (iter a null-value)
+))
+
+(accumulate * 1 identity 1 inc 10)
