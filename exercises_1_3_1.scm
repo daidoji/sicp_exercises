@@ -105,3 +105,52 @@
 ))
 
 (accumulate * 1 identity 1 inc 10)
+
+; Exercise 1.33
+; Show that accumulate has a more general form filtered-accumulate which has an
+; identical signature but with the additional predicate of a filter function
+; that only accumulates for terms matching the given filter
+(define (filtered-accumulate combiner null-value filtered-pred term a next b)
+  (if (> a b) 
+    null-value
+    (if (filtered-pred a) 
+      (combiner (term a) 
+                (filtered-accumulate combiner null-value filtered-pred 
+                                     term (next a) next b))
+      (combiner null-value
+                (filtered-accumulate combiner null-value filtered-pred 
+                                     term (next a) next b))
+    )
+))
+
+(define (return-true x) #t)
+
+; My test
+(filtered-accumulate * 1 return-true identity 1 inc 10)
+
+; Code needed to define prime?
+(define (smallest-divisor n) (find-divisor n 2))
+
+(define (find-divisor n test-divisor) 
+  (cond ((> (square test-divisor) n) n)
+    ((divides? test-divisor n) test-divisor) 
+    (else (find-divisor n (+ test-divisor 1)))))
+
+(define (divides? a b) (= (remainder b a) 0))
+
+(define (prime? n)
+    (= n (smallest-divisor n)))
+
+; Square def
+(define (square x) (* x x))
+
+; a)
+(filtered-accumulate + 0 prime? square 1 inc 10)
+
+; b) 
+(define (product-rel-prime-lt-n n)
+  (define (rel-prime-to-n x)
+    (= (gcd x n) 1))
+  (filtered-accumulate * 1 rel-prime-to-n identity 1 inc n)
+)
+(product-rel-prime-lt-n 10)
