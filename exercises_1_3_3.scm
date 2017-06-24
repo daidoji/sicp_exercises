@@ -57,49 +57,45 @@
 
 ;;; recursive
 (define (cont-frac n d max_iterations)
-  (define (cont-frac-recur n d max_iterations iterations)
-    (if (= iterations max_iterations)
+  (define (cont-frac-recur iterations)
+    (if (< iterations max_iterations)
+      (/ (n iterations) (+ (d iterations) (cont-frac-recur (+ iterations 1))))
       (/ (n iterations) (d iterations))
-      (/ 1 (+ (d iterations) (cont-frac-recur n d max_iterations (+ iterations 1))))
     )
   )
-  (cont-frac-recur n d max_iterations 0))
+  (cont-frac-recur 1))
 
-(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 15)
+(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 50)
 
 ;;; iterative
 (define (cont-frac n d max_iterations)
-  (define (cont-frac-iter n d max_iterations accumulated)
-    (newline)
-    (display accumulated)
-    (if (= max_iterations 0)
-      accumulated
-      (if (= accumulated 0)
-         (cont-frac-iter n d (- max_iterations 1) (/ (n max_iterations) (d max_iterations)))
-         (cont-frac-iter n d (- max_iterations 1) (/ 1 (+ (d max_iterations) accumulated)))
-      )))
-  (cont-frac-iter n d max_iterations 0))
+  (define (cont-frac-iter iterations accumulator)
+    (if (= iterations 0)
+      accumulator
+      (cont-frac-iter (- iterations 1) (/ (n iterations) (+ (d iterations) accumulator)))
+    ))
+  (cont-frac-iter max_iterations (/ (n max_iterations) (d max_iterations))))
 
-(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 15)
+(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 50)
 
 ;;; Exercise 1.38
 ;;;
 ;;; Use cont-frac procedure to approximate e using Euler's expansion.  Euler's
 ;;; expansion is a k-term continued fraction where D_i == 1 and N_i is the
 ;;; sequence 1, 2, 1, 1, 4, 1, 1, 6...
+;;; e = 2.71828182845904
+;;; e - 2 = 0.71828182845904
 
 (define (seq i)
-  (define (seq-accum i step accumulated)
-    (if (= step i)
-      (if (= (- (modulo i 3) 1) 0)
-        (+ accumulated 2)
-        1)
-      (if (= (- (modulo step 3) 1) 0)
-        (seq-accum i (+ step 1) (+ accumulated 2))
-        (seq-accum i (+ step 1) accumulated))
+  (define (seq-accum step accumulated)
+    (if (= i step)
+      (if (= (modulo step 3) 2) (+ accumulated 2) 1)
+      (if (= (modulo step 3) 2)
+        (seq-accum (+ step 1) (+ accumulated 2))
+        (seq-accum (+ step 1) accumulated))
   ))
-  (seq-accum i 0 0))
-(cont-frac seq (lambda (i) 1.0) 100)
+  (seq-accum 1 0))
+(cont-frac (lambda (i) 1.0) seq 100)
 
 ;;; Exercise 1.39
 ;;; 
@@ -107,27 +103,12 @@
 
 (define (seed-n x)
   (lambda (i)
-    (if (= i 0)
+    (if (= i 1)
       x
-      (* x x))))
+      (- (* x x)))))
 
 (define (d i)
   (+ 1 (* (- i 1) 2)))
-
-;;; iterative
-(define (cont-frac n d max_iterations)
-  (define (cont-frac-iter n d max_iterations accumulated)
-    (newline)
-    (display accumulated)
-    (if (= max_iterations 0)
-      (/ (n max_iterations) accumulated)
-      (if (= accumulated 0)
-        (cont-frac-iter n d (- max_iterations 1) (/ (n max_iterations) (d max_iterations)))
-        (cont-frac-iter n d (- max_iterations 1) (- (d max_iterations) accumulated))
-      )))
-  (cont-frac-iter n d max_iterations 0))
-
-(cont-frac (lambda (i) 1.0) (lambda (i) 1.0) 15)
 
 (tan 2.0)
 (cont-frac (seed-n 2.0) d 10)
