@@ -51,6 +51,21 @@
 ;;; defined to be the function x f(g(x)). Define a procedure compose that
 ;;; implements composition. For example, if inc is a procedure that adds 1 to
 ;;; its argument
-;;; ((compose square inc) 6)
-;;; 49
 
+(define (compose func_f func_g)
+  (lambda (x) (func_f (func_g x))))
+
+((compose square inc) 6)
+
+;;; Exercise 1.43
+;;;
+;;;Write a procedure that takes as inputs a procedure that computes f and a
+;;;positive integer n and returns the procedure that computes the nth repeated
+;;;application of f. Your procedure should be able to be used as follows:
+
+(define (repeated func iterations)
+  (if (= iterations 0) 
+    (lambda (x) (func x))
+    (compose func (repeated func (- iterations 2)))))
+
+((repeated square 2) 5)
